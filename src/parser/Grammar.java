@@ -9,7 +9,7 @@ public class Grammar {
     Map<String, List<ProdRule>> prodRules = new HashMap<>();
 
     static final String SEPARATOR = "->";
-    static final String EPSILON = "$";
+    static final String EPSILON = "#";
 
     String startingSymbol = "";
 
