@@ -90,7 +90,7 @@ public class Grammar {
             }
         }
         if(nonTerminal.equals(startingSymbol)){
-            rez.add(EPSILON);
+            rez.add("$");
         }
         return rez;
     }
