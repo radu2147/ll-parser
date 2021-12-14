@@ -11,6 +11,9 @@ public class Grammar {
     static final String SEPARATOR = "->";
     static final String EPSILON = "#";
 
+    Map<String, Set<String>> first = new HashMap<>();
+    Map<String, Set<String>> follow = new HashMap<>();
+
     String startingSymbol = "";
 
     public void readGrammarFromFile(String filename){
@@ -39,6 +42,9 @@ public class Grammar {
     }
 
     public Set<String> first(String symbol){
+        if(first.containsKey(symbol)){
+            return first.get(symbol);
+        }
         if(symbol.equals(EPSILON)){
             return Set.of(EPSILON);
         }
@@ -62,6 +68,7 @@ public class Grammar {
                     }
                 }
             }
+            first.put(symbol, fin);
             return fin;
         }
         System.err.println("Unknown symbol");
