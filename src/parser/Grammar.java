@@ -16,6 +16,9 @@ public class Grammar {
 
     String startingSymbol = "";
 
+    public Grammar(){
+    }
+
     public void readGrammarFromFile(String filename){
         try {
             File myObj = new File(filename);
@@ -25,6 +28,7 @@ public class Grammar {
                 String[] data = myReader.nextLine().split(SEPARATOR);
                 if(startingSymbol.equals("")){
                     startingSymbol = data[0];
+
                 }
                 if(prodRules.containsKey(data[0]))
                     prodRules.get(data[0]).add(new ProdRule(data[0], data[1]));
@@ -32,12 +36,58 @@ public class Grammar {
                     var mutList = new ArrayList<ProdRule>();
                     mutList.add(new ProdRule(data[0], data[1]));
                     prodRules.put(data[0], mutList);
+                    follow.put(data[0], new HashSet<>());
                 }
             }
+            var lst = new HashSet<String>();
+            lst.add("$");
+            follow.put(startingSymbol, lst);
+            computeFollow();
             myReader.close();
         } catch (FileNotFoundException e) {
             System.out.println("An error occurred.");
             e.printStackTrace();
+        }
+    }
+
+    private boolean isNonterminal(Character chr){
+        return chr.toString().toUpperCase().equals(chr.toString()) && !chr.toString().equals("#");
+    }
+
+    private void computeFollow(){
+        var changed = true;
+        while(changed){
+            changed = false;
+            for(var val: prodRules.entrySet()){
+                for(var right: val.getValue()) {
+                    for (int i = 0; i < right.right.length(); i++) {
+                        if (isNonterminal(right.right.charAt(i))) {
+                            if (i == right.right.length() - 1) {
+                                if(!follow.get(String.valueOf(right.right.charAt(i))).containsAll(follow.get(val.getKey()))){
+                                    changed = true;
+                                }
+                                follow.get(String.valueOf(right.right.charAt(i))).addAll(follow.get(val.getKey()));
+                            } else {
+                                var frst = first(String.valueOf(right.right.charAt(i + 1)));
+                                if (frst.contains(EPSILON)) {
+                                    if(!follow.get(String.valueOf(right.right.charAt(i))).containsAll(follow.get(val.getKey())) && !follow.get(String.valueOf(right.right.charAt(i))).containsAll(frst.stream().filter(it -> !it.equals(EPSILON)).collect(Collectors.toList()))){
+                                        changed = true;
+                                    }
+                                    follow.get(String.valueOf(right.right.charAt(i))).addAll(frst.stream().filter(it -> !it.equals(EPSILON)).collect(Collectors.toList()));
+                                    if(follow.containsKey(String.valueOf(right.right.charAt(i)))) {
+                                        follow.get(String.valueOf(right.right.charAt(i))).addAll(follow.get(val.getKey()));
+                                    }
+                                } else {
+                                    if(!follow.get(String.valueOf(right.right.charAt(i))).containsAll(follow.get(val.getKey()))){
+                                        changed = true;
+                                    }
+                                    follow.get(String.valueOf(right.right.charAt(i))).addAll(frst);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -76,29 +126,6 @@ public class Grammar {
     }
 
     public Set<String> follow(String nonTerminal){
-        Set<String> rez = new HashSet<>();
-        for(var val: prodRules.entrySet()){
-            for(var right: val.getValue()) {
-                for (int i = 0; i < right.right.length(); i++) {
-                    if (right.right.charAt(i) == nonTerminal.charAt(0)) {
-                        if (i == right.right.length() - 1) {
-                            rez.addAll(follow(val.getKey()));
-                        } else {
-                            var frst = first(String.valueOf(right.right.charAt(i + 1)));
-                            if (frst.contains(EPSILON)) {
-                                rez.addAll(frst.stream().filter(it -> !it.equals(EPSILON)).collect(Collectors.toList()));
-                                rez.addAll(follow(String.valueOf(right.right.charAt(i + 1))));
-                            } else {
-                                rez.addAll(frst);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        if(nonTerminal.equals(startingSymbol)){
-            rez.add("$");
-        }
-        return rez;
+        return follow.get(nonTerminal);
     }
 }

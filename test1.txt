@@ -1,4 +1,4 @@
-S->aSF
-S->i
-F->bS
-F->#
+S->abA
+S->#
+A->Saa
+A->b
