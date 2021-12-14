@@ -2,9 +2,11 @@ package parser;
 import java.util.Map;
 import java.util.Stack;
 
+import static parser.Grammar.EPSILON;
+
 public class Analyzer {
-    Stack<String> inputBand = new Stack<String>();
-    Stack<String> workingStack = new Stack<String>();
+    Stack<String> inputBand = new Stack<>();
+    Stack<String> workingStack = new Stack<>();
     Map<String, Map<String,ProdRule>> table;
     String sequence;
     String startingSymbol;
@@ -36,17 +38,24 @@ public class Analyzer {
             line = workingStack.peek();
             column = inputBand.peek();
 
-            ProdRule tableCell = table.get(line).get(column);
+            ProdRule tableCell = null;
+            if(table.containsKey(line)) {
+                if (table.get(line).containsKey(column)) {
+                    tableCell = table.get(line).get(column);
+                }
+            }
 
             if (tableCell != null) {
                 String prodRight = tableCell.getRight();
 
                 if (prodRight != null) {
                     workingStack.pop();
-                    for (int i = prodRight.length() - 1; i >= 0; i--) {
-                        char c = sequence.charAt(i);
-                        String str = String.valueOf(c);
-                        workingStack.push(str);
+                    if(!prodRight.equals(EPSILON)) {
+                        for (int i = prodRight.length() - 1; i >= 0; i--) {
+                            char c = prodRight.charAt(i);
+                            String str = String.valueOf(c);
+                            workingStack.push(str);
+                        }
                     }
                 }
                 else {

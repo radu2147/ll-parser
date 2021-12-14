@@ -1,3 +1,2 @@
-S->XX
-X->aX
-X->y
+A->aAb
+A->#
