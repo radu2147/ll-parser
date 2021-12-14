@@ -19,7 +19,7 @@ public class Main {
             parser.constructTable();
             table = parser.getTable();
 
-            Analyzer analyzer = new Analyzer(table, startingSymbol, "ab");
+            Analyzer analyzer = new Analyzer(table, startingSymbol, "aaaaab");
 
             analyzer.analyze();
         }

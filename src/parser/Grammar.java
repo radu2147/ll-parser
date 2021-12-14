@@ -91,7 +91,52 @@ public class Grammar {
         }
     }
 
-    public Set<String> first(String symbol){
+    public Set<String> first(String sym){
+        var st = new Stack<String>();
+        st.push(sym);
+        while(!st.empty()){
+            var symbol = st.pop();
+            if(first.containsKey(symbol)){
+                return first.get(symbol);
+            }
+            if(symbol.equals(EPSILON) || symbol.toLowerCase().equals(symbol)){
+                first.put(symbol, Set.of(symbol));
+            }
+            if(prodRules.containsKey(symbol)){
+                Set<String> fin = new HashSet<>();
+                var stop = false;
+                for(var rule: prodRules.get(symbol)) {
+                    String rightMember = rule.right;
+                    for (Character ch : rightMember.toCharArray()) {
+                        if(first.containsKey(ch.toString())) {
+                            Set<String> rez = first.get(ch.toString());
+                            if (rez.size() == 1 && rez.contains(EPSILON)) {
+                                fin.add(EPSILON);
+                            } else {
+                                fin.addAll(rez.stream().filter(it -> !it.equals(EPSILON)).collect(Collectors.toList()));
+                                if (!rez.contains(EPSILON)) {
+                                    break;
+                                }
+                            }
+                        }
+                        else{
+                            st.push(symbol);
+                            st.push(ch.toString());
+                            stop = true;
+                            break;
+                        }
+                    }
+                    if(stop){
+                        break;
+                    }
+                }
+                first.put(symbol, fin);
+            }
+        }
+        return first.get(sym);
+    }
+
+    public Set<String> firstRec(String symbol){
         if(first.containsKey(symbol)){
             return first.get(symbol);
         }
