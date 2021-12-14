@@ -1,4 +1,3 @@
-S->abA
-S->#
-A->Saa
-A->b
+S->XX
+X->aX
+X->y

@@ -128,4 +128,8 @@ public class Grammar {
     public Set<String> follow(String nonTerminal){
         return follow.get(nonTerminal);
     }
+
+    public String getStartingSymbol() {
+        return startingSymbol;
+    }
 }

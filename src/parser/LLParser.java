@@ -12,6 +12,10 @@ public class LLParser {
     Grammar grm;
     Map<String, Map<String,ProdRule>> table;
 
+    public Map<String, Map<String, ProdRule>> getTable() {
+        return table;
+    }
+
     public LLParser(Grammar grm){
         this.grm = grm;
         this.table = new HashMap<>();
