@@ -1,19 +1,21 @@
 package parser;
 
+import java.util.List;
+
 public class ProdRule {
 
     String left;
-    String right;
+    List<String> right;
 
     public String getLeft() {
         return left;
     }
 
-    public String getRight() {
+    public List<String> getRight() {
         return right;
     }
 
-    public ProdRule(String leftMember, String rightMember){
+    public ProdRule(String leftMember, List<String> rightMember){
         this.left = leftMember;
         this.right = rightMember;
     }

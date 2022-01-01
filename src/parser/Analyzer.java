@@ -1,4 +1,5 @@
 package parser;
+import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
@@ -8,10 +9,10 @@ public class Analyzer {
     Stack<String> inputBand = new Stack<>();
     Stack<String> workingStack = new Stack<>();
     Map<String, Map<String,ProdRule>> table;
-    String sequence;
+    List<String> sequence;
     String startingSymbol;
 
-    public Analyzer(Map<String, Map<String,ProdRule>> table, String startingSymbol, String sequence) {
+    public Analyzer(Map<String, Map<String,ProdRule>> table, String startingSymbol, List<String> sequence) {
         this.table = table;
         this.startingSymbol = startingSymbol;
         this.sequence = sequence;
@@ -21,10 +22,9 @@ public class Analyzer {
         inputBand.push("$");
         workingStack.push("$");
 
-        for (int i = sequence.length() - 1; i >= 0; i--) {
-            char c = sequence.charAt(i);
-            String str = String.valueOf(c);
-            inputBand.push(str);
+        for (int i = sequence.size() - 1; i >= 0; i--) {
+            var c = sequence.get(i);
+            inputBand.push(c);
         }
 
         workingStack.push(startingSymbol);
@@ -46,15 +46,14 @@ public class Analyzer {
             }
 
             if (tableCell != null) {
-                String prodRight = tableCell.getRight();
+                List<String> prodRight = tableCell.getRight();
 
                 if (prodRight != null) {
                     workingStack.pop();
                     if(!prodRight.equals(EPSILON)) {
-                        for (int i = prodRight.length() - 1; i >= 0; i--) {
-                            char c = prodRight.charAt(i);
-                            String str = String.valueOf(c);
-                            workingStack.push(str);
+                        for (int i = prodRight.size() - 1; i >= 0; i--) {
+                            var c = prodRight.get(i);
+                            workingStack.push(c);
                         }
                     }
                 }

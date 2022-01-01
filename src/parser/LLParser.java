@@ -36,11 +36,11 @@ public class LLParser {
         table.put("$", acc);
     }
 
-    private List<String> findTerminals(String sequence){
+    private List<String> findTerminals(List<String> sequence){
         ArrayList<String> rez = new ArrayList<>();
-        for(Character ch: sequence.toCharArray()){
-            if(!ch.toString().equals(EPSILON) && ch.toString().toLowerCase().equals(ch.toString()))
-                rez.add(ch.toString());
+        for(var ch: sequence){
+            if(!ch.equals(EPSILON) && ((Character)ch.charAt(0)).toString().toLowerCase().equals(String.valueOf(ch.charAt(0))))
+                rez.add(ch);
         }
         return rez;
     }
@@ -48,11 +48,11 @@ public class LLParser {
     public void constructTable() throws Exception {
         for(var el: this.grm.prodRules.keySet()){
             for(var rule: this.grm.prodRules.get(el)){
-                var first = grm.first(String.valueOf(rule.right.charAt(0)));
+                var first = grm.first(rule.right.get(0));
                 for(var terminal: first){
                     if(!terminal.equals(EPSILON)){
                         if(table.get(rule.left).containsKey(terminal)){
-                            throw new Exception("Grammar is not LL");
+                            throw new Exception("Grammar is not LL(1)");
                         }
                         table.get(rule.left).put(terminal, rule);
                     }
@@ -60,7 +60,7 @@ public class LLParser {
                         var follow = grm.follow(rule.left);
                         for(var fl: follow){
                             if(table.get(rule.left).containsKey(fl)){
-                                throw new Exception("Grammar is not LL");
+                                throw new Exception("Grammar is not LL(1)");
                             }
                             table.get(rule.left).put(fl, rule);
                         }

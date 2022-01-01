@@ -1,2 +1,6 @@
-A->aA
-A->b
+S->int id { Declarare Lista_instr }
+Declarare->int id ;
+Lista_instr->Instr Inter_lista_instr
+Inter_lista_instr->Instr Inter_lista_instr
+Inter_lista_instr->#
+Instr->id = a ;

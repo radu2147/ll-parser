@@ -31,10 +31,10 @@ public class Grammar {
 
                 }
                 if(prodRules.containsKey(data[0]))
-                    prodRules.get(data[0]).add(new ProdRule(data[0], data[1]));
+                    prodRules.get(data[0]).add(new ProdRule(data[0], List.of(data[1].split("\s"))));
                 else{
                     var mutList = new ArrayList<ProdRule>();
-                    mutList.add(new ProdRule(data[0], data[1]));
+                    mutList.add(new ProdRule(data[0], List.of(data[1].split("\s"))));
                     prodRules.put(data[0], mutList);
                     follow.put(data[0], new HashSet<>());
                 }
@@ -50,8 +50,8 @@ public class Grammar {
         }
     }
 
-    private boolean isNonterminal(Character chr){
-        return chr.toString().toUpperCase().equals(chr.toString()) && !chr.toString().equals("#");
+    private boolean isNonterminal(String chr){
+        return ((Character)chr.charAt(0)).toString().matches("[A-Z]");
     }
 
     private void computeFollow(){
@@ -60,28 +60,28 @@ public class Grammar {
             changed = false;
             for(var val: prodRules.entrySet()){
                 for(var right: val.getValue()) {
-                    for (int i = 0; i < right.right.length(); i++) {
-                        if (isNonterminal(right.right.charAt(i))) {
-                            if (i == right.right.length() - 1) {
-                                if(!follow.get(String.valueOf(right.right.charAt(i))).containsAll(follow.get(val.getKey()))){
+                    for (int i = 0; i < right.right.size(); i++) {
+                        if (isNonterminal(right.right.get(i))) {
+                            if (i == right.right.size() - 1) {
+                                if(!follow.get(String.valueOf(right.right.get(i))).containsAll(follow.get(val.getKey()))){
                                     changed = true;
                                 }
-                                follow.get(String.valueOf(right.right.charAt(i))).addAll(follow.get(val.getKey()));
+                                follow.get(String.valueOf(right.right.get(i))).addAll(follow.get(val.getKey()));
                             } else {
-                                var frst = first(String.valueOf(right.right.charAt(i + 1)));
+                                var frst = first(String.valueOf(right.right.get(i + 1)));
                                 if (frst.contains(EPSILON)) {
-                                    if(!follow.get(String.valueOf(right.right.charAt(i))).containsAll(follow.get(val.getKey())) && !follow.get(String.valueOf(right.right.charAt(i))).containsAll(frst.stream().filter(it -> !it.equals(EPSILON)).collect(Collectors.toList()))){
+                                    if(!follow.get(String.valueOf(right.right.get(i))).containsAll(follow.get(val.getKey())) && !follow.get(String.valueOf(right.right.get(i))).containsAll(frst.stream().filter(it -> !it.equals(EPSILON)).collect(Collectors.toList()))){
                                         changed = true;
                                     }
-                                    follow.get(String.valueOf(right.right.charAt(i))).addAll(frst.stream().filter(it -> !it.equals(EPSILON)).collect(Collectors.toList()));
-                                    if(follow.containsKey(String.valueOf(right.right.charAt(i)))) {
-                                        follow.get(String.valueOf(right.right.charAt(i))).addAll(follow.get(val.getKey()));
+                                    follow.get(String.valueOf(right.right.get(i))).addAll(frst.stream().filter(it -> !it.equals(EPSILON)).collect(Collectors.toList()));
+                                    if(follow.containsKey(String.valueOf(right.right.get(i)))) {
+                                        follow.get(String.valueOf(right.right.get(i))).addAll(follow.get(val.getKey()));
                                     }
                                 } else {
-                                    if(!follow.get(String.valueOf(right.right.charAt(i))).containsAll(follow.get(val.getKey()))){
+                                    if(!follow.get(String.valueOf(right.right.get(i))).containsAll(frst)){
                                         changed = true;
                                     }
-                                    follow.get(String.valueOf(right.right.charAt(i))).addAll(frst);
+                                    follow.get(String.valueOf(right.right.get(i))).addAll(frst);
                                 }
                             }
                         }
@@ -91,7 +91,7 @@ public class Grammar {
         }
     }
 
-    public Set<String> first(String sym){
+    public Set<String> firstNerec(String sym){
         var st = new Stack<String>();
         st.push(sym);
         while(!st.empty()){
@@ -106,10 +106,10 @@ public class Grammar {
                 Set<String> fin = new HashSet<>();
                 var stop = false;
                 for(var rule: prodRules.get(symbol)) {
-                    String rightMember = rule.right;
-                    for (Character ch : rightMember.toCharArray()) {
-                        if(first.containsKey(ch.toString())) {
-                            Set<String> rez = first.get(ch.toString());
+                    List<String> rightMember = rule.right;
+                    for (String ch : rightMember) {
+                        if(first.containsKey(ch)) {
+                            Set<String> rez = first.get(ch);
                             if (rez.size() == 1 && rez.contains(EPSILON)) {
                                 fin.add(EPSILON);
                             } else {
@@ -136,7 +136,7 @@ public class Grammar {
         return first.get(sym);
     }
 
-    public Set<String> firstRec(String symbol){
+    public Set<String> first(String symbol){
         if(first.containsKey(symbol)){
             return first.get(symbol);
         }
@@ -149,8 +149,8 @@ public class Grammar {
         if(prodRules.containsKey(symbol)){
             Set<String> fin = new HashSet<>();
             for(var rule: prodRules.get(symbol)) {
-                String rightMember = rule.right;
-                for (Character ch : rightMember.toCharArray()) {
+                List<String> rightMember = rule.right;
+                for (String ch : rightMember) {
                     Set<String> rez = first(ch.toString());
                     if(rez.size() == 1 && rez.contains(EPSILON)){
                         fin.add(EPSILON);
