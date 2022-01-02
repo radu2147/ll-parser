@@ -1,6 +1,49 @@
-S->int id { Declarare Lista_instr }
-Declarare->int id ;
+S->int id ( ) { Declarare Lista_instr }
+Declarare->Tip Lista_variabile ;
+Lista_variabile->id Inter_lista_variabile
+Inter_lista_variabile->#
+Inter_lista_variabile->, id Inter_lista_variabile
 Lista_instr->Instr Inter_lista_instr
 Inter_lista_instr->Instr Inter_lista_instr
 Inter_lista_instr->#
-Instr->id = a ;
+Instr->Asignare
+Instr->Citire
+Instr->Afisare
+Instr->Ciclare
+Instr->Conditionala
+Conditionala->if ( Expr_bool ) Bloc_instr Cond_else
+Cond_else->else Bloc_instr
+Ciclare->while ( Expr_bool ) Bloc_instr
+Bloc_instr->Instr
+Bloc_instr->{ Lista_instr }
+Afisare->cout << id Afisare_aux ;
+Afisare_aux-><< id Afisare_aux
+Afisare_aux->#
+Citire->cin >> id Citire_aux ;
+Citire_aux->>> id Citire_aux
+Citire_aux->#
+Asignare->id = Expr ;
+Expr->T E2
+E2->+ T E2
+E2->- T E2
+E2->#
+T->F T2
+T2->* F T2
+T2->/ F T2
+T2->#
+F->( Expr )
+F->id
+F->const
+Expr_bool->Expr Op_bool Expr
+Op_bool->==
+Op_bool->!=
+Op_bool-><=
+Op_bool->>=
+Op_bool->>
+Op_bool-><
+Oper_aritmetici->+
+Oper_aritmetici->-
+Oper_aritmetici->/
+Oper_aritmetici->*
+Tip->int
+Tip->float

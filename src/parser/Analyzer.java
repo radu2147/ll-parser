@@ -47,10 +47,9 @@ public class Analyzer {
 
             if (tableCell != null) {
                 List<String> prodRight = tableCell.getRight();
-
                 if (prodRight != null) {
                     workingStack.pop();
-                    if(!prodRight.equals(EPSILON)) {
+                    if(!prodRight.get(0).equals(EPSILON)) {
                         for (int i = prodRight.size() - 1; i >= 0; i--) {
                             var c = prodRight.get(i);
                             workingStack.push(c);
@@ -59,7 +58,6 @@ public class Analyzer {
                 }
                 else {
                     String prodLeft = tableCell.getLeft();
-
                     if (prodLeft.equals("pop")) {
                         inputBand.pop();
                         workingStack.pop();

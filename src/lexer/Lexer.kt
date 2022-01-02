@@ -31,19 +31,18 @@ class Lexer {
     }
 
     fun isOperator(elem: String): Boolean{
-        return elem == "!=" || elem == ">" || elem == "=" || elem == "<" || elem == "+" || elem == "-" || elem == "==" || elem == "<<" || elem == "!" || elem == ">>"
+        return elem == "!=" || elem == ">" || elem == "=" || elem == "<" || elem == "+" || elem == "-" || elem == "*" || elem == "/" || elem == "==" || elem == "<<" || elem == "!" || elem == ">>"
     }
 
     fun isOperatorRegex(elem: String): Boolean{
         return elem.matches(Regex("([+]|[-]|[*]|[>]|[<]|[!]|[=])+"))
     }
 
-
-    fun analyzeWithoutSpaces(filename: String): Map<String, Int> {
+    fun analyzeWithoutSpaces(filename: String): BijectiveMap<String, Int> {
         var index = 0
         var errors = ""
         var lineCount = 0
-        val table = mutableMapOf<String, Int>()
+        val table = BijectiveMap<String, Int>()
         val inputStream: InputStream = File(filename).inputStream()
         val inputString = inputStream.bufferedReader().use { it.readText() }.split("\n").map { it.trim() }
         var current = ""
@@ -55,48 +54,48 @@ class Lexer {
                     current += it
                 } else {
                     if (isKeyword(current)) {
-                        if (!table.contains(current)) {
-                            table[current] = index++
+                        if (!table.containsKey(current)) {
+                            table.put(current, index++)
                         }
-                        fip.add(Pair<Int?, Int?>(table[current], null))
+                        fip.add(Pair<Int?, Int?>(table.getValue(current), null))
                     } else if (isOperator(current)) {
-                        if (!table.contains(current)) {
-                            table[current] = index++
+                        if (!table.containsKey(current)) {
+                            table.put(current, index++)
                         }
-                        fip.add(Pair<Int?, Int?>(table[current], null))
+                        fip.add(Pair<Int?, Int?>(table.getValue(current), null))
                     } else if (isId(current)) {
                         if(current.length > 254){
                             errors += "Identifier too long at line ${lineCount}"
                         }
                         else {
-                            if (!table.contains("ID")) {
-                                table["ID"] = index++
+                            if (!table.containsKey("id")) {
+                                table.put("id", index++);
                             }
                             val elem = ts.get(current)
                             if (elem == null) {
                                 ts.put(current, ++start)
-                                fip.add(Pair<Int?, Int?>(table["ID"], start))
+                                fip.add(Pair<Int?, Int?>(table.getValue("id"), start))
                             } else {
-                                fip.add(Pair<Int?, Int?>(table["ID"], elem))
+                                fip.add(Pair<Int?, Int?>(table.getValue("id"), elem))
                             }
                         }
                     } else if (isConstant(current)) {
-                        if (!table.contains("CONST")) {
-                            table["CONST"] = index++
+                        if (!table.containsKey("const")) {
+                            table.put("const", index++);
                         }
                         val elem = ts.get(current)
                         if(elem == null) {
                             ts.put(current, ++start)
-                            fip.add(Pair<Int?, Int?>(table["CONST"], start))
+                            fip.add(Pair<Int?, Int?>(table.getValue("const"), start))
                         }
                         else{
-                            fip.add(Pair<Int?, Int?>(table["CONST"],elem))
+                            fip.add(Pair<Int?, Int?>(table.getValue("const"),elem))
                         }
                     } else if(isSeparator(current)){
-                        if (!table.contains(current)) {
-                            table[current] = index++
+                        if (!table.containsKey(current)) {
+                            table.put(current, index++);
                         }
-                        fip.add(Pair<Int?, Int?>(table[current], null))
+                        fip.add(Pair<Int?, Int?>(table.getValue(current), null))
 
                     }
                     else{
@@ -107,7 +106,51 @@ class Lexer {
 
             }
         }
-        if(errors.length > 0){
+        if (isKeyword(current)) {
+            if (!table.containsKey(current)) {
+                table.put(current, index++)
+            }
+            fip.add(Pair<Int?, Int?>(table.getValue(current), null))
+        } else if (isOperator(current)) {
+            if (!table.containsKey(current)) {
+                table.put(current, index++)
+            }
+            fip.add(Pair<Int?, Int?>(table.getValue(current), null))
+        } else if (isId(current)) {
+            if(current.length > 254){
+                errors += "Identifier too long at line ${lineCount}"
+            }
+            else {
+                if (!table.containsKey("id")) {
+                    table.put("id", index++);
+                }
+                val elem = ts.get(current)
+                if (elem == null) {
+                    ts.put(current, ++start)
+                    fip.add(Pair<Int?, Int?>(table.getValue("id"), start))
+                } else {
+                    fip.add(Pair<Int?, Int?>(table.getValue("id"), elem))
+                }
+            }
+        } else if (isConstant(current)) {
+            if (!table.containsKey("const")) {
+                table.put("const", index++);
+            }
+            val elem = ts.get(current)
+            if(elem == null) {
+                ts.put(current, ++start)
+                fip.add(Pair<Int?, Int?>(table.getValue("const"), start))
+            }
+            else{
+                fip.add(Pair<Int?, Int?>(table.getValue("const"),elem))
+            }
+        } else if(isSeparator(current)) {
+            if (!table.containsKey(current)) {
+                table.put(current, index++);
+            }
+            fip.add(Pair<Int?, Int?>(table.getValue(current), null))
+        }
+        if(errors.isNotEmpty()){
             throw Exception(errors)
         }
         return table
