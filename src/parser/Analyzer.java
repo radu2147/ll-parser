@@ -1,4 +1,6 @@
 package parser;
+import lexer.InputSequence;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
@@ -9,10 +11,10 @@ public class Analyzer {
     Stack<String> inputBand = new Stack<>();
     Stack<String> workingStack = new Stack<>();
     Map<String, Map<String,ProdRule>> table;
-    List<String> sequence;
+    List<InputSequence> sequence;
     String startingSymbol;
 
-    public Analyzer(Map<String, Map<String,ProdRule>> table, String startingSymbol, List<String> sequence) {
+    public Analyzer(Map<String, Map<String,ProdRule>> table, String startingSymbol, List<InputSequence> sequence) {
         this.table = table;
         this.startingSymbol = startingSymbol;
         this.sequence = sequence;
@@ -24,7 +26,7 @@ public class Analyzer {
 
         for (int i = sequence.size() - 1; i >= 0; i--) {
             var c = sequence.get(i);
-            inputBand.push(c);
+            inputBand.push(c.getSymbol());
         }
 
         workingStack.push(startingSymbol);

@@ -5,7 +5,7 @@ import java.io.InputStream
 
 class Lexer {
 
-    val ts: HashTable<Int> = HashTable()
+    val ts: BijectiveMap<String, Int> = BijectiveMap()
     val fip: MutableList<Pair<Int?, Int?>> = mutableListOf()
 
     val automatId: Automat = Automat("C:\\Users\\RADU\\Desktop\\my_projects\\facultate\\lftc\\limbaje\\src\\id.txt")
@@ -23,7 +23,7 @@ class Lexer {
     }
 
     fun isKeyword(elem: String): Boolean {
-        return elem == "cout" || elem == "if" || elem == "else" || elem == "cin" || elem == "while" || elem == "int" || elem == "float" || elem == "struct"
+        return elem == "cout" || elem == "if" || elem == "else" || elem == "cin" || elem == "try" || elem == "catch" || elem == "while" || elem == "int" || elem == "float" || elem == "struct"
     }
 
     fun isSeparator(elem: String): Boolean{
@@ -71,7 +71,7 @@ class Lexer {
                             if (!table.containsKey("id")) {
                                 table.put("id", index++);
                             }
-                            val elem = ts.get(current)
+                            val elem = ts.getValue(current)
                             if (elem == null) {
                                 ts.put(current, ++start)
                                 fip.add(Pair<Int?, Int?>(table.getValue("id"), start))
@@ -83,7 +83,7 @@ class Lexer {
                         if (!table.containsKey("const")) {
                             table.put("const", index++);
                         }
-                        val elem = ts.get(current)
+                        val elem = ts.getValue(current)
                         if(elem == null) {
                             ts.put(current, ++start)
                             fip.add(Pair<Int?, Int?>(table.getValue("const"), start))
@@ -124,7 +124,7 @@ class Lexer {
                 if (!table.containsKey("id")) {
                     table.put("id", index++);
                 }
-                val elem = ts.get(current)
+                val elem = ts.getValue(current)
                 if (elem == null) {
                     ts.put(current, ++start)
                     fip.add(Pair<Int?, Int?>(table.getValue("id"), start))
@@ -136,7 +136,7 @@ class Lexer {
             if (!table.containsKey("const")) {
                 table.put("const", index++);
             }
-            val elem = ts.get(current)
+            val elem = ts.getValue(current)
             if(elem == null) {
                 ts.put(current, ++start)
                 fip.add(Pair<Int?, Int?>(table.getValue("const"), start))

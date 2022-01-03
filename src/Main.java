@@ -1,3 +1,4 @@
+import lexer.InputSequence;
 import lexer.Lexer;
 import parser.Analyzer;
 import parser.Grammar;
@@ -20,7 +21,7 @@ public class Main {
         try {
             parser.constructTable();
             table = parser.getTable();
-            Analyzer analyzer = new Analyzer(table, startingSymbol, lexer.getFip().stream().map(k -> el.getKey(k.component1())).collect(Collectors.toList()));
+            Analyzer analyzer = new Analyzer(table, startingSymbol, lexer.getFip().stream().map(k -> new InputSequence(el.getKey(k.component1()), lexer.getTs().getKey(k.component2()))).collect(Collectors.toList()));
             analyzer.analyze();
         }
         catch (Exception e){

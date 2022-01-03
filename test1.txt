@@ -11,6 +11,8 @@ Instr->Citire
 Instr->Afisare
 Instr->Ciclare
 Instr->Conditionala
+Instr->Exceptions
+Exceptions->try Bloc_instr catch ( id ) Bloc_instr
 Conditionala->if ( Expr_bool ) Bloc_instr Cond_else
 Cond_else->else Bloc_instr
 Ciclare->while ( Expr_bool ) Bloc_instr
